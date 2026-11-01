@@ -100,6 +100,7 @@ function Footer() {
 function App() {
   const [stocks, setStocks] = useState([]);
   const [mode, setMode] = useState("normal");
+  const [sensitivity, setSensitivityState] = useState("medium");
   const [news, setNews] = useState([]);
   const [indices, setIndices] = useState([]);
   const [trades, setTrades] = useState([]);
@@ -192,6 +193,7 @@ function App() {
   const applyMarket = useCallback((data) => {
     setStocks(data.stocks);
     setMode(data.mode);
+    setSensitivityState(data.sensitivity || "medium");
     setNews(data.news);
     setIndices(data.indices || []);
     setTrades(data.trades || []);
@@ -358,6 +360,27 @@ function App() {
       }
     } catch {
       // the next market refresh will show the real mode
+    }
+  }
+
+  // How strongly prices react (calm, normal or volatile). Changes it for everyone.
+  async function changeSensitivity(level) {
+    setSensitivityState(level);
+    try {
+      const res = await fetch(`${API}/api/market/sensitivity`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ level }),
+      });
+      if (!res.ok) {
+        const r = await res.json().catch(() => ({}));
+        showNotice(r.error || "The setting could not be changed.");
+      }
+    } catch {
+      // the next market refresh will show the real setting
     }
   }
 
@@ -529,6 +552,8 @@ function App() {
               toggleWatch={toggleWatch}
               mode={mode}
               changeMode={changeMode}
+              sensitivity={sensitivity}
+              changeSensitivity={changeSensitivity}
               news={news}
               learning={learning}
               indices={indices}

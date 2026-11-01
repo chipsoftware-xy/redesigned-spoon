@@ -6,6 +6,7 @@ import { randomUUID, randomBytes, scryptSync, timingSafeEqual } from "node:crypt
 import {
   getMarket,
   setMode,
+  setSensitivity,
   startMarket,
   previewOrder,
   executeOrder,
@@ -273,6 +274,21 @@ app.post("/api/market/mode", auth, (req, res) => {
   }
   if (!setMode(req.body.mode)) {
     return res.status(400).json({ error: "Unknown mode" });
+  }
+  lastMoodChange = Date.now();
+  res.json({ ok: true });
+});
+
+// How strongly prices react: low, medium or high (shares the cooldown with the mood)
+app.post("/api/market/sensitivity", auth, (req, res) => {
+  const wait = lastMoodChange + MOOD_COOLDOWN_MS - Date.now();
+  if (wait > 0) {
+    return res.status(429).json({
+      error: `Someone just changed the market. Try again in ${Math.ceil(wait / 1000)} seconds.`,
+    });
+  }
+  if (!setSensitivity(req.body.level)) {
+    return res.status(400).json({ error: "Unknown level" });
   }
   lastMoodChange = Date.now();
   res.json({ ok: true });

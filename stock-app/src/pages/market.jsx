@@ -63,6 +63,8 @@ function Market({
   toggleWatch,
   mode,
   changeMode,
+  sensitivity = "medium",
+  changeSensitivity,
   news = [],
   learning,
   indices = [],
@@ -157,13 +159,39 @@ function Market({
             ))}
           </div>
           <p className="mode-desc">{MODE_TEXT[mode]}</p>
+
+          <div className="modes">
+            <span className="modes-label">Market sensitivity:</span>
+            {[
+              ["low", "Calm"],
+              ["medium", "Normal"],
+              ["high", "Volatile"],
+            ].map(([id, label]) => (
+              <button
+                key={id}
+                className={sensitivity === id ? "mode-btn active" : "mode-btn"}
+                onClick={() => changeSensitivity(id)}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+          <p className="note-small">
+            Sensitivity is how strongly prices react to the mood, news and random
+            noise. <strong>Calm</strong> halves the reaction: prices drift slowly,
+            good for seeing the basics. <strong>Normal</strong> is the standard
+            setting. <strong>Volatile</strong> doubles it: bigger swings, faster
+            crashes and rallies, and circuit breakers that trigger more often.
+            Real markets are calm in quiet times and volatile in panics, so try
+            all three with the same mood and compare.
+          </p>
           <p className="note-small">
             Changing the mood does not move prices instantly. It changes the
             push on prices, which builds up over time: expect a minute or two
             before a crash is clearly visible, and a few minutes for a big
             fall. If the main index drops 10% from yesterday's close, the
-            circuit breaker halts trading for 15 minutes, as it would in real
-            life. Real crashes unfold over days or weeks, so this is a
+            circuit breaker halts trading for a while, as it would in real
+            life (the length depends on the time of day). Real crashes unfold over days or weeks, so this is a
             heavily sped-up version.
           </p>
           <p className="note-small">

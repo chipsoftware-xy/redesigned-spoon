@@ -148,12 +148,28 @@ const FORCE_OPEN = process.env.FORCE_OPEN === "1";
 // Stock level: a price can only move this far from yesterday's close in a day.
 const BAND = 0.2;
 // Market level: if the main index (SANRIO 18) moves this far from yesterday's close,
-// trading stops everywhere. mins = how long (null = for the rest of the day).
-const BREAKERS = [
-  { pct: 10, mins: 15 },
-  { pct: 15, mins: 30 },
-  { pct: 20, mins: null },
-];
+// trading stops everywhere. How long depends on how far into the day it happens,
+// exactly as on the real NSE (rules from nseindia.com, in minutes of a 9:15-15:30 day).
+// We keep the PROPORTIONS: a halt is the same share of our trading day as it is of the real one.
+const REAL_DAY_MIN = 375; // 9:15 am to 3:30 pm
+const BREAKERS = [10, 15, 20];
+
+// f = how much of the trading day has passed (0 to 1). Returns null for no halt,
+// "rest" for the rest of the day, or the halt length as a share of the day.
+function haltShare(pct, f) {
+  const at = (h, m) => (h * 60 + m - (9 * 60 + 15)) / REAL_DAY_MIN; // real clock time -> share of the day
+  if (pct === 10) {
+    if (f < at(13, 0)) return 45 / REAL_DAY_MIN; // before 1 pm: 45 minutes
+    if (f < at(14, 30)) return 15 / REAL_DAY_MIN; // 1 pm to 2:30 pm: 15 minutes
+    return null; // after 2:30 pm: no halt
+  }
+  if (pct === 15) {
+    if (f < at(13, 0)) return 105 / REAL_DAY_MIN; // before 1 pm: 1 hour 45 minutes
+    if (f < at(14, 0)) return 45 / REAL_DAY_MIN; // 1 pm to 2 pm: 45 minutes
+    return "rest"; // after 2 pm: rest of the day
+  }
+  return "rest"; // 20%: rest of the day, any time
+}
 
 // ---------- company results ----------
 // A company reports results about every 3000-7000 open ticks (roughly 1.5-4 hours of trading).
@@ -172,6 +188,22 @@ const DIV_EVERY = 5;
 
 // With FORCE_OPEN (always-open demo mode) there is no real night, so a "day" is this long
 const DEMO_DAY_MS = 20 * 60 * 1000;
+
+// ---------- market sensitivity ----------
+// How strongly prices react to the mood, news and random noise. Shared by everyone, like the mood.
+// calm = half as jumpy, normal = as designed, volatile = twice as jumpy.
+const SENSITIVITY = { low: 0.5, medium: 1, high: 2 };
+let sensitivity = Object.hasOwn(SENSITIVITY, process.env.DEFAULT_SENSITIVITY)
+  ? process.env.DEFAULT_SENSITIVITY
+  : "medium";
+
+export function setSensitivity(level) {
+  if (!Object.hasOwn(SENSITIVITY, level)) return false;
+  sensitivity = level;
+  const names = { low: "calm", medium: "normal", high: "volatile" };
+  addNews({ sector: "Market", text: `The market is now ${names[level]}: prices react ${level === "low" ? "less" : level === "high" ? "more" : "as usual"} to moods and news`, up: true });
+  return true;
+}
 
 // ---------- 4. NEWS EVENTS ----------
 // impulse = size of the shock to that sector (0.04 = about 5% in total)
@@ -614,17 +646,18 @@ export function tick() {
   }
 
   const m = MODES[mode];
-  const marketReturn = m.drift + randn() * m.vol;
+  const k = SENSITIVITY[sensitivity];
+  const marketReturn = (m.drift + randn() * m.vol) * k;
 
   // 1. each sector's momentum fades a bit and gets a little random push
   for (const sector of Object.keys(SECTORS)) {
-    momentum[sector] = momentum[sector] * 0.8 + randn() * 0.004;
+    momentum[sector] = momentum[sector] * 0.8 + randn() * 0.004 * k;
   }
 
   // 2. maybe a news event hits one sector
   if (Math.random() < EVENT_CHANCE) {
     const e = EVENTS[Math.floor(Math.random() * EVENTS.length)];
-    momentum[e.sector] += e.impulse;
+    momentum[e.sector] += e.impulse * k;
     addNews({ sector: e.sector, text: e.text, up: e.impulse > 0 });
   }
 
@@ -641,7 +674,7 @@ export function tick() {
 
     const marketPart = SECTORS[stock.sector].beta * marketReturn;
     const sectorPart = own[stock.sector];
-    const noise = randn() * 0.002;
+    const noise = randn() * 0.002 * k;
 
     // company results: now and then a company reports earnings and the price reacts
     let earnPart = stock.earn;
@@ -724,28 +757,38 @@ function reportResults(stock) {
     text: `${stock.name} reports results: profit ${growth >= 0 ? "up" : "down"} ${Math.abs(growth).toFixed(1)}%, ${up ? "beating" : "missing"} expectations by ${Math.abs(surprise).toFixed(1)}%`,
     up,
   });
-  return (surprise / 100) * EARNINGS_REACTION;
+  return (surprise / 100) * EARNINGS_REACTION * SENSITIVITY[sensitivity];
 }
 
 // Market-wide circuit breaker: if the main index moves too far from yesterday's close
 function checkBreakers(now) {
   const ix = indices[0];
   const move = Math.abs((ix.value / ix.prevClose - 1) * 100);
-  for (let i = BREAKERS.length - 1; i >= 0; i--) {
-    const level = BREAKERS[i];
-    if (move < level.pct || breakerHit[level.pct]) continue;
-    for (const l of BREAKERS) if (l.pct <= level.pct) breakerHit[l.pct] = true;
+  const dayLength = FORCE_OPEN ? DEMO_DAY_MS : (CLOSE_MIN - OPEN_MIN) * 60000;
+  const dayStart = FORCE_OPEN ? dayStartedAt : istInfo(now).dayStart + OPEN_MIN * 60000;
+  const f = clamp((now - dayStart) / dayLength, 0, 1); // how far into the day we are
 
+  for (let i = BREAKERS.length - 1; i >= 0; i--) {
+    const pct = BREAKERS[i];
+    if (move < pct || breakerHit[pct]) continue;
+    for (const p of BREAKERS) if (p <= pct) breakerHit[p] = true;
+
+    const share = haltShare(pct, f);
     const direction = ix.value >= ix.prevClose ? "up" : "down";
-    const restOfDay = level.mins === null;
+    if (share === null) {
+      addNews({ sector: "Market", text: `${ix.name} is ${direction} ${pct}% late in the day: no halt (the real rule has none after 2:30 pm)`, up: direction === "up" });
+      break;
+    }
+    const restOfDay = share === "rest";
     const until = restOfDay
       ? FORCE_OPEN
-        ? now + 60 * 60 * 1000
+        ? dayStartedAt + DEMO_DAY_MS
         : nextScheduleChange(now)
-      : now + level.mins * 60 * 1000;
+      : now + share * dayLength;
+    const mins = restOfDay ? 0 : Math.max(1, Math.round((share * dayLength) / 60000));
     session.state = "halted";
     session.haltUntil = until;
-    session.haltReason = `${ix.name} is ${direction} ${level.pct}%: trading halted ${restOfDay ? "for the rest of the day" : `for ${level.mins} minutes`}`;
+    session.haltReason = `${ix.name} is ${direction} ${pct}%: trading halted ${restOfDay ? "for the rest of the day" : `for ${mins} minute${mins === 1 ? "" : "s"}`}`;
     addNews({ sector: "Market", text: `Circuit breaker: ${session.haltReason}`, up: direction === "up" });
     break;
   }
@@ -1135,6 +1178,7 @@ function publicStock(s) {
 export function getMarket() {
   return {
     mode,
+    sensitivity,
     news,
     trades,
     session: {
