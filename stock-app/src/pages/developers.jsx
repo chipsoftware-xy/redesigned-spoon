@@ -285,7 +285,7 @@ function LiveComparison({ stocks }) {
                 <XAxis dataKey="time" hide />
                 <YAxis domain={["auto", "auto"]} width={60} tickFormatter={(v) => v.toFixed(0)} />
                 <Tooltip formatter={(v) => `₹${Number(v).toFixed(2)}`} />
-                <Line type="monotone" dataKey="price" stroke="#7c3aed" dot={false} isAnimationActive={false} />
+                <Line type="monotone" dataKey="price" stroke="#D362A4" dot={false} isAnimationActive={false} />
                 <Line type="linear" dataKey="after" stroke={lineColor} strokeDasharray="4 3" strokeWidth={2} dot={{ r: 3 }} isAnimationActive={false} />
               </LineChart>
             </ResponsiveContainer>
@@ -311,7 +311,7 @@ function LiveComparison({ stocks }) {
                   <XAxis dataKey="time" hide />
                   <YAxis domain={["auto", "auto"]} width={60} tickFormatter={(v) => v.toFixed(0)} />
                   <Tooltip formatter={(v) => `₹${Number(v).toFixed(2)}`} />
-                  <Line type="monotone" dataKey="price" stroke="#2563eb" dot={false} isAnimationActive={false} />
+                  <Line type="monotone" dataKey="price" stroke="#FF9A56" dot={false} isAnimationActive={false} />
                   <Line type="linear" dataKey="after" stroke={lineColor} strokeDasharray="4 3" strokeWidth={2} dot={{ r: 3 }} isAnimationActive={false} />
                 </LineChart>
               </ResponsiveContainer>

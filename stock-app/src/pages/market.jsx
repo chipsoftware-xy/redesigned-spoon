@@ -169,7 +169,7 @@ function Market({
             ].map(([id, label]) => (
               <button
                 key={id}
-                className={sensitivity === id ? "mode-btn active" : "mode-btn"}
+                className={sensitivity === id ? "mode-btn sens active" : "mode-btn sens"}
                 onClick={() => changeSensitivity(id)}
               >
                 {label}

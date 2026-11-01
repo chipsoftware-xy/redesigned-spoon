@@ -355,7 +355,7 @@ function StockDetail({
                   <BarChart data={stock.candles}>
                     <XAxis dataKey="time" hide />
                     <YAxis width={70} tickFormatter={(v) => v.toFixed(0)} />
-                    <Bar dataKey="v" fill="#c4b5fd" isAnimationActive={false} />
+                    <Bar dataKey="v" fill="#FF9A56" isAnimationActive={false} />
                   </BarChart>
                 </ResponsiveContainer>
               </div>
@@ -379,13 +379,13 @@ function StockDetail({
                   {learning && (
                     <ReferenceLine
                       y={base}
-                      stroke="#7c3aed"
+                      stroke="#D362A4"
                       strokeDasharray="5 5"
                       label={{
                         value: "Base value",
                         position: "insideTopRight",
                         fontSize: 12,
-                        fill: "#7c3aed",
+                        fill: "#D362A4",
                       }}
                     />
                   )}
