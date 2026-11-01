@@ -156,6 +156,7 @@ function App() {
   // login state
   const [token, setToken] = useState(() => localStorage.getItem("token"));
   const [username, setUsername] = useState(null);
+  const [displayName, setDisplayName] = useState("");
   const [authChecked, setAuthChecked] = useState(
     () => !localStorage.getItem("token")
   );
@@ -180,6 +181,7 @@ function App() {
     localStorage.setItem("token", session.token);
     setToken(session.token);
     setUsername(session.username);
+    setDisplayName(session.name || session.username);
     applyData(session.data);
     setWatchlist(session.data.watchlist);
     setDataLoaded(true);
@@ -233,7 +235,7 @@ function App() {
         }
         if (!res.ok) return null;
         const me = await res.json();
-        return { token: saved, username: me.username, data: me.data };
+        return { token: saved, username: me.username, name: me.name, data: me.data };
       })
       .then((session) => {
         if (session) loadSession(session);
@@ -508,7 +510,7 @@ function App() {
             {theme === "dark" ? "Light" : "Dark"}
           </button>
           <Link to="/wallet">Wallet: ₹{balance.toFixed(2)}</Link>
-          <span className="user">{username}</span>
+          <span className="user" title={`@${username}`}>{displayName}</span>
           <button className="logout" onClick={logout}>
             Log out
           </button>

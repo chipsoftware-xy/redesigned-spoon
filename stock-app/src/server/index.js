@@ -198,7 +198,15 @@ app.get("/api/health", (req, res) => {
 app.post("/api/auth/register", registerLimit, (req, res) => {
   const username = cleanUsername(req.body.username);
   const password = String(req.body.password ?? "");
+  const name = String(req.body.name ?? "").trim().replace(/\s+/g, " ");
+  const age = Number(req.body.age);
 
+  if (name.length < 2 || name.length > 40) {
+    return res.status(400).json({ error: "Please enter your name (2-40 characters)." });
+  }
+  if (!Number.isInteger(age) || age < 13 || age > 100) {
+    return res.status(400).json({ error: "Age must be a whole number from 13 to 100." });
+  }
   if (!username) {
     return res.status(400).json({
       error: "Username: 3-20 characters, letters/numbers/underscore, starting with a letter.",
@@ -212,10 +220,10 @@ app.post("/api/auth/register", registerLimit, (req, res) => {
   }
 
   const { salt, hash } = hashPassword(password);
-  db.users[username] = { salt, hash, data: normalise({}) };
+  db.users[username] = { salt, hash, name, age, data: normalise({}) };
   const token = newSession(username);
   touchUser(username);
-  res.json({ token, username, data: db.users[username].data });
+  res.json({ token, username, name, data: db.users[username].data });
 });
 
 app.post("/api/auth/login", loginLimit, (req, res) => {
@@ -228,7 +236,7 @@ app.post("/api/auth/login", loginLimit, (req, res) => {
   }
 
   const token = newSession(username);
-  res.json({ token, username, data: user.data });
+  res.json({ token, username, name: user.name || username, data: user.data });
 });
 
 app.post("/api/auth/logout", auth, (req, res) => {
@@ -239,7 +247,7 @@ app.post("/api/auth/logout", auth, (req, res) => {
 
 // ---------- per-user data ----------
 app.get("/api/me", auth, (req, res) => {
-  res.json({ username: req.username, data: db.users[req.username].data });
+  res.json({ username: req.username, name: db.users[req.username].name || req.username, data: db.users[req.username].data });
 });
 
 // only the watchlist can be saved from the browser

@@ -207,3 +207,48 @@ html[data-theme="dark"] .candle-tip {
 html[data-theme="dark"] .recharts-tooltip-label,
 html[data-theme="dark"] .recharts-tooltip-item { color: var(--d-text) !important; }
 html[data-theme="dark"] .recharts-legend-item-text { color: var(--d-muted) !important; }
+
+/* ===== Login / sign-up form layout (both themes) ===== */
+.auth-card .field { display: flex; flex-direction: column; gap: 6px; margin: 14px 0; text-align: left; }
+.auth-card .field label { font-size: 13px; font-weight: 600; margin: 0; }
+.auth-card .field input,
+.auth-card .field select {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 11px 12px;
+  font-size: 15px;
+  border-radius: 10px;
+  border: 1px solid rgba(124, 58, 237, 0.3);
+}
+.auth-card .form-row { display: flex; gap: 12px; }
+.auth-card .form-row .grow { flex: 1; min-width: 0; }
+.auth-card .form-row .narrow { width: 96px; flex: none; }
+.auth-card .primary-btn { width: 100%; margin-top: 8px; padding: 12px; }
+.auth-card .auth-switch { text-align: center; margin-top: 16px; }
+.auth-card .auth-error { margin: 12px 0; }
+
+/* ===== Market search bar (both themes) ===== */
+.search-box { position: relative; display: flex; align-items: center; margin: 14px 0 4px; }
+.search-box input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 12px 74px 12px 42px;
+  font-size: 15px;
+  border-radius: 999px;
+  border: 1px solid rgba(124, 58, 237, 0.3);
+}
+.search-icon { position: absolute; left: 15px; opacity: 0.55; pointer-events: none; }
+.search-clear {
+  position: absolute;
+  right: 8px;
+  border: none;
+  background: rgba(124, 58, 237, 0.15);
+  color: inherit;
+  border-radius: 999px;
+  padding: 5px 12px;
+  font-size: 12px;
+  cursor: pointer;
+}
+.search-count { margin: 4px 4px 10px; }
+html[data-theme="dark"] .search-clear { background: rgba(167, 139, 250, 0.2) !important; color: #e4d9ff !important; }
+html[data-theme="dark"] .search-box input:focus { box-shadow: 0 0 0 3px rgba(244, 114, 182, 0.25); border-color: #f472b6 !important; }
