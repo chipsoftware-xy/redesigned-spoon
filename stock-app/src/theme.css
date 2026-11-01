@@ -1,0 +1,209 @@
+/* ===== Theme: dark by default, light when the toggle is pressed =====
+   Add this file's contents to the END of src/index.css (or import it in main.jsx
+   after index.css). The pink, blue and violet accents stay; only the backgrounds,
+   text and borders change. Everything is under html[data-theme="dark"], so the
+   light theme is untouched. */
+
+/* ---- things that exist in both themes ---- */
+.theme-toggle {
+  border: 1px solid rgba(124, 58, 237, 0.35);
+  background: transparent;
+  color: inherit;
+  border-radius: 999px;
+  padding: 4px 12px;
+  font-size: 13px;
+  cursor: pointer;
+}
+.toast {
+  position: fixed;
+  left: 50%;
+  bottom: 24px;
+  transform: translateX(-50%);
+  background: #5b21b6;
+  color: #fff;
+  padding: 10px 18px;
+  border-radius: 12px;
+  font-size: 14px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+  z-index: 50;
+  max-width: 90vw;
+}
+
+/* ---- dark colours ---- */
+html[data-theme="dark"] {
+  color-scheme: dark;
+
+  --d-bg: #130f1f;
+  --d-surface: #1c1730;
+  --d-surface-2: #262040;
+  --d-border: #3a3157;
+  --d-text: #efeaff;
+  --d-muted: #a89fc6;
+  --d-pink: #f472b6;
+  --d-blue: #7cc4ff;
+  --d-violet: #a78bfa;
+
+  /* if your index.css uses variables like these, they become dark too */
+  --bg: var(--d-bg);
+  --card: var(--d-surface);
+  --surface: var(--d-surface);
+  --border: var(--d-border);
+  --text: var(--d-text);
+  --muted: var(--d-muted);
+  --violet-soft: #2a2250;
+  --pink-soft: #3a1c35;
+  --blue-soft: #16294a;
+  --white: var(--d-surface);
+}
+
+html[data-theme="dark"] body {
+  background: radial-gradient(1200px 600px at 10% -10%, #2a1740 0%, transparent 60%),
+    radial-gradient(900px 500px at 100% 0%, #10264a 0%, transparent 55%), var(--d-bg) !important;
+  background-attachment: fixed !important;
+  color: var(--d-text) !important;
+}
+
+html[data-theme="dark"] h1,
+html[data-theme="dark"] h2,
+html[data-theme="dark"] h3,
+html[data-theme="dark"] h4,
+html[data-theme="dark"] strong,
+html[data-theme="dark"] label,
+html[data-theme="dark"] p,
+html[data-theme="dark"] li,
+html[data-theme="dark"] td,
+html[data-theme="dark"] th {
+  color: var(--d-text);
+}
+html[data-theme="dark"] h1 { color: #f6d7ff; }
+html[data-theme="dark"] .note-small,
+html[data-theme="dark"] small,
+html[data-theme="dark"] .empty,
+html[data-theme="dark"] .panel-sub,
+html[data-theme="dark"] .modes-label,
+html[data-theme="dark"] .mode-desc,
+html[data-theme="dark"] .index-name,
+html[data-theme="dark"] .summary-card span,
+html[data-theme="dark"] .wallet-balance span,
+html[data-theme="dark"] .copyright { color: var(--d-muted) !important; }
+
+html[data-theme="dark"] a { color: #c4b5fd; }
+html[data-theme="dark"] a:hover { color: #f9a8d4; }
+html[data-theme="dark"] .up { color: #4ade80 !important; }
+html[data-theme="dark"] .down { color: #f87171 !important; }
+
+/* top bar */
+html[data-theme="dark"] .topbar {
+  background: transparent !important;
+  color: var(--d-text);
+}
+html[data-theme="dark"] .topbar a { color: #e4d9ff; }
+html[data-theme="dark"] .topbar a:hover { color: #f9a8d4; }
+html[data-theme="dark"] .user { color: var(--d-muted) !important; }
+html[data-theme="dark"] .logout,
+html[data-theme="dark"] .theme-toggle,
+html[data-theme="dark"] .link-btn {
+  background: transparent !important;
+  color: #e4d9ff !important;
+  border-color: var(--d-border) !important;
+}
+html[data-theme="dark"] .view-toggle { background: var(--d-surface-2) !important; border-color: var(--d-border) !important; }
+html[data-theme="dark"] .view-btn { color: var(--d-muted) !important; background: transparent !important; }
+html[data-theme="dark"] .view-btn.active {
+  background: linear-gradient(135deg, #7c3aed, #db2777) !important;
+  color: #fff !important;
+}
+
+/* cards and panels */
+html[data-theme="dark"] :is(
+  .trade-card, .summary-card, .wallet-card, .wallet-balance, .doc-card, .company-card,
+  .case-box, .case-item, .news-box, .news-item, .index-card, .side-panel, .panel-mood,
+  .panel-live, .qr-box, .auth-card, .block, .detail-main, .chart-box, .big-msg, .todo,
+  .how-card, .stock-card, .card
+) {
+  background: var(--d-surface) !important;
+  color: var(--d-text);
+  border-color: var(--d-border) !important;
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.28) !important;
+}
+html[data-theme="dark"] .index-card.broad {
+  background: linear-gradient(135deg, #2b1c4d, #1b2a52) !important;
+}
+html[data-theme="dark"] :is(.preview-box, .company-grid div, .toc a, .advisory, .network-note, .badge, .sector-tag, .circuit-tag) {
+  background: var(--d-surface-2) !important;
+  color: #d9ccff !important;
+  border-color: var(--d-border) !important;
+}
+html[data-theme="dark"] .advisory { border-left-color: var(--d-pink) !important; color: var(--d-text) !important; }
+html[data-theme="dark"] .toc a:hover { background: #3a2a6a !important; }
+
+/* tables */
+html[data-theme="dark"] table { background: transparent !important; color: var(--d-text); }
+html[data-theme="dark"] th {
+  background: var(--d-surface-2) !important;
+  color: #d9ccff !important;
+  border-color: var(--d-border) !important;
+}
+html[data-theme="dark"] td { border-color: var(--d-border) !important; background: transparent !important; }
+html[data-theme="dark"] tbody tr:hover td { background: rgba(167, 139, 250, 0.08) !important; }
+html[data-theme="dark"] .row-highlight td { background: rgba(244, 114, 182, 0.12) !important; }
+html[data-theme="dark"] .total-row td { border-top-color: var(--d-violet) !important; }
+html[data-theme="dark"] .fee-table td { border-color: var(--d-border) !important; }
+
+/* inputs and buttons */
+html[data-theme="dark"] :is(input, select, textarea) {
+  background: #0f0b1a !important;
+  color: var(--d-text) !important;
+  border: 1px solid var(--d-border) !important;
+}
+html[data-theme="dark"] :is(input, textarea)::placeholder { color: #6f6693; }
+html[data-theme="dark"] :is(input, select, textarea):focus {
+  outline: none;
+  border-color: var(--d-violet) !important;
+  box-shadow: 0 0 0 3px rgba(167, 139, 250, 0.25);
+}
+html[data-theme="dark"] .tab:not(.active),
+html[data-theme="dark"] .mode-btn:not(.active) {
+  background: var(--d-surface-2) !important;
+  color: #d9ccff !important;
+  border-color: var(--d-border) !important;
+}
+html[data-theme="dark"] .tab.active { background: linear-gradient(135deg, #7c3aed, #db2777) !important; color: #fff !important; border-color: transparent !important; }
+html[data-theme="dark"] .cancel-btn { background: transparent !important; color: #fca5a5 !important; border-color: #7f1d1d !important; }
+html[data-theme="dark"] .star { color: #6f6693; }
+
+/* market status banner */
+html[data-theme="dark"] .session-bar.open { background: #0e2a1a !important; color: #86efac !important; }
+html[data-theme="dark"] .session-bar.closed { background: #33141a !important; color: #fca5a5 !important; }
+html[data-theme="dark"] .session-bar.halted { background: #3a230f !important; color: #fdba74 !important; }
+html[data-theme="dark"] .session-bar.forced { background: #271f4d !important; color: #c4b5fd !important; }
+
+/* order book and developer page bits */
+html[data-theme="dark"] .book-row { color: var(--d-text); }
+html[data-theme="dark"] .book-bar.ask { background: rgba(248, 113, 113, 0.28) !important; }
+html[data-theme="dark"] .book-bar.bid { background: rgba(74, 222, 128, 0.28) !important; }
+html[data-theme="dark"] .book-mid { border-color: var(--d-border) !important; color: var(--d-text); }
+html[data-theme="dark"] .open-order { border-color: var(--d-border) !important; }
+html[data-theme="dark"] .bar-track { background: var(--d-surface-2) !important; }
+html[data-theme="dark"] .bar-fill.fake { background: #a78bfa !important; }
+html[data-theme="dark"] .bar-fill.real { background: #60a5fa !important; }
+
+/* footer */
+html[data-theme="dark"] .site-footer { border-color: var(--d-border) !important; background: transparent !important; }
+
+/* charts (recharts) */
+html[data-theme="dark"] .recharts-cartesian-grid line { stroke: #342b52; }
+html[data-theme="dark"] .recharts-cartesian-axis-line,
+html[data-theme="dark"] .recharts-cartesian-axis-tick-line { stroke: #4a3f73; }
+html[data-theme="dark"] .recharts-text,
+html[data-theme="dark"] .recharts-cartesian-axis-tick-value { fill: var(--d-muted); }
+html[data-theme="dark"] .recharts-default-tooltip,
+html[data-theme="dark"] .candle-tip {
+  background: #1c1730 !important;
+  border: 1px solid var(--d-border) !important;
+  color: var(--d-text) !important;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5) !important;
+}
+html[data-theme="dark"] .recharts-tooltip-label,
+html[data-theme="dark"] .recharts-tooltip-item { color: var(--d-text) !important; }
+html[data-theme="dark"] .recharts-legend-item-text { color: var(--d-muted) !important; }
