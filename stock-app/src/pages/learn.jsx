@@ -89,7 +89,7 @@ function Learn() {
   const [open, setOpen] = useState(false);
 
   return (
-    <div className="app">
+    <div className="app wide">
       <Link to="/">← Back to market</Link>
       <h1>Understanding the market first</h1>
       <p>

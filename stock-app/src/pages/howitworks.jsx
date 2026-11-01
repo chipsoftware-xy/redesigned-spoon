@@ -116,7 +116,7 @@ const INDEX_MAP = [
 
 function HowItWorks() {
   return (
-    <div className="app">
+    <div className="app wide">
       <Link to="/">← Back to market</Link>
       <h1>How this platform simulates a real market</h1>
 
