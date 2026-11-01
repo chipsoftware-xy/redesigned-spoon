@@ -98,6 +98,8 @@ function Learn() {
       </p>
 
       <div className="toc">
+        <a href="#purpose">What this platform is for</a>
+        <a href="#limits">What it leaves out</a>
         <a href="#stock">What is a stock</a>
         <a href="#exchange">Exchanges</a>
         <a href="#price">Why prices move</a>
@@ -107,6 +109,104 @@ function Learn() {
         <a href="#global">The world is connected</a>
         <a href="#risk">Risk and costs</a>
         <a href="#words">Glossary</a>
+      </div>
+
+      <div id="purpose">
+        <Section title="What this platform is for">
+          <p>
+            This is a practice space for building an <strong>intuition</strong>{" "}
+            for how a stock market works. It is made for understanding ideas, not
+            for predicting real prices or learning to trade for real money.
+          </p>
+          <ul>
+            <li>
+              <strong>What it is good for:</strong> seeing how buyers and sellers
+              set a price through an order book, why a big order moves a price,
+              how market moods and news ripple from sector to sector, what an
+              index like Nifty or Sensex is and how it is built, and how charges,
+              tax, circuit breakers, dividends and order types change what you
+              actually keep.
+            </li>
+            <li>
+              <strong>What it is not:</strong> a forecast, a trading strategy
+              tester, financial advice, or a copy of the real exchange. Every
+              company is invented and every price is simulated.
+            </li>
+            <li>
+              <strong>How to use it:</strong> try something, watch what happens,
+              then open the Developers page to see the maths behind it and how it
+              compares with the real market.
+            </li>
+          </ul>
+          <p className="note-small">
+            Winning or losing here says nothing about how you would do in a real
+            market. The prices follow rules we wrote, and real prices do not.
+          </p>
+        </Section>
+      </div>
+
+      <div id="limits">
+        <Section title="What this model leaves out compared with a real market">
+          <p>
+            A real market is far bigger and messier. These are the main things
+            missing, so you know where the simulation stops being a good guide:
+          </p>
+          <ul>
+            <li>
+              <strong>Real people and real news.</strong> Prices here are moved by
+              six kinds of simple bots and random events. Real prices are moved
+              by millions of people, big institutions, foreign investors, company
+              announcements, politics and rumours, none of which follow a neat
+              formula.
+            </li>
+            <li>
+              <strong>Wild moves.</strong> Real markets have sudden jumps, long
+              calm spells followed by panics, and stocks that fall together when
+              fear spreads. This model is calmer and more predictable than the
+              real thing.
+            </li>
+            <li>
+              <strong>Borrowing and short selling.</strong> Real traders can
+              borrow money to trade bigger (margin) and bet on prices falling
+              (short selling). That can multiply gains, and losses, and cause
+              forced selling. Not included here.
+            </li>
+            <li>
+              <strong>Futures and options.</strong> Most real trading volume is in
+              these contracts, which are linked to shares and indices. Not
+              included.
+            </li>
+            <li>
+              <strong>Other things you can invest in.</strong> Mutual funds, ETFs,
+              bonds, gold and foreign markets behave differently from single
+              stocks.
+            </li>
+            <li>
+              <strong>Company events.</strong> Stock splits, bonus shares, rights
+              issues, mergers and companies being added to or removed from an
+              index.
+            </li>
+            <li>
+              <strong>Market machinery.</strong> The opening auction, delivery of
+              shares a day after the trade, holidays, bulk deals and a different
+              daily price limit for each stock.
+            </li>
+            <li>
+              <strong>Taxes in full.</strong> Long-term gains, yearly tax returns,
+              setting losses against gains and tax on dividends are simplified or
+              left out.
+            </li>
+            <li>
+              <strong>Your own feelings.</strong> With fake money it is easy to
+              stay calm. With real savings, fear and greed change how people act,
+              and that matters more than any formula.
+            </li>
+          </ul>
+          <p className="note-small">
+            The Developers page has a table comparing the real rules with this
+            platform line by line.
+          </p>
+        </Section>
       </div>
 
       <div id="stock">

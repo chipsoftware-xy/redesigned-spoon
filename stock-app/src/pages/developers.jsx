@@ -91,8 +91,8 @@ const BOTS = [
 function chargesFor(side, value) {
   const brokerage = Math.min(20, value * 0.0003);
   const stt = value * 0.001;
-  const exchange = value * 0.0000297 + value * 0.000001;
-  const gst = (brokerage + value * 0.0000297 + value * 0.000001) * 0.18;
+  const exchange = value * 0.0000307 + value * 0.000001;
+  const gst = (brokerage + value * 0.0000307 + value * 0.000001) * 0.18;
   const stamp = side === "buy" ? value * 0.00015 : 0;
   return { brokerage, stt, exchange, gst, stamp, total: brokerage + stt + exchange + gst + stamp };
 }
@@ -648,6 +648,7 @@ function Developers({ stocks, indices = [] }) {
         <a href="#breakers">Circuit breakers</a>
         <a href="#company">Company data</a>
         <a href="#hours">Market hours</a>
+        <a href="#reality">Real rules vs here</a>
       </div>
 
       {stocks.length > 0 && <LiveComparison stocks={stocks} />}
@@ -880,11 +881,14 @@ function Developers({ stocks, indices = [] }) {
         </div>
         <p>
           <strong>Tax on profit.</strong> When you sell above the average price
-          you paid, 20% of the profit (after charges) is taken. A loss is not
-          taxed and does not reduce future tax. Real India has short-term and
-          long-term rules that depend on how long you held, and tax is paid
-          yearly. Here it is one simple rate, taken at the time of sale, because
-          the platform runs days in minutes.
+          you paid, 20% of the profit (after charges) is taken. This matches
+          India's short-term capital gains rate on listed shares (20%), which
+          applies when you hold for 12 months or less, and everything here is
+          held for minutes or days. Real long-term gains (over 12 months) are
+          taxed at 12.5% on the part above Rs 1.25 lakh a year. Real tax is
+          also worked out once a year on your total gains, and losses can be
+          set against gains. Here it is taken at the time of each sale, and a
+          loss is not carried forward, to keep it simple.
         </p>
         <p>
           Buy and sell the same shares straight away to see what it costs: the
@@ -913,16 +917,19 @@ function Developers({ stocks, indices = [] }) {
               <tr><th>Move</th><th>This platform</th><th>Real India (as far as I know)</th></tr>
             </thead>
             <tbody>
-              <tr><td>10%</td><td>Trading halts for 15 minutes</td><td>45 minutes before 1 pm, 15 minutes from 1 to 2:30 pm, no halt after 2:30 pm</td></tr>
-              <tr><td>15%</td><td>Halts for 30 minutes</td><td>1 hour 45 minutes before 1 pm, 45 minutes from 1 to 2 pm, rest of day after</td></tr>
-              <tr><td>20%</td><td>Halts for the rest of the day</td><td>Trading ends for the day</td></tr>
+              <tr><td>10%</td><td>Halt of about 12% of the trading day if early (before 1 pm equivalent), 4% from 1 to 2:30 pm equivalent, none after</td><td>45 minutes before 1 pm, 15 minutes from 1 pm to 2:30 pm, no halt after 2:30 pm</td></tr>
+              <tr><td>15%</td><td>Halt of about 28% of the day if early, 12% from 1 to 2 pm equivalent, rest of the day after</td><td>1 hour 45 minutes before 1 pm, 45 minutes from 1 pm to 2 pm, rest of the day after 2 pm</td></tr>
+              <tr><td>20%</td><td>Halts for the rest of the day</td><td>Rest of the day, at any time</td></tr>
             </tbody>
           </table>
         </div>
         <p className="note-small">
           The real rules are set by SEBI and the exchanges and have changed over
-          time, so check their websites. This platform uses fixed durations to
-          keep things simple.
+          time, so check their websites. This platform copies the same time-of-day
+          rules, but squeezes them to fit its shorter day, so each halt is the
+          same share of the day as in real life. Real India also gives each
+          stock its own daily band (2%, 5%, 10% or 20%, and no fixed band for
+          the biggest stocks); here every stock uses 20%.
         </p>
       </div>
 
@@ -962,6 +969,53 @@ function Developers({ stocks, indices = [] }) {
           Developers: start the server with FORCE_OPEN=1 to switch the schedule
           off and practise any time.
         </p>
+      </div>
+
+      <div className="doc-card" id="reality">
+        <h3>9. Real rules compared with this platform</h3>
+        <p>
+          A quick reference of the real Indian rules this platform copies, and
+          where it deliberately simplifies. Checked in November 2026 against the
+          sources below. Rules and rates change, so treat this as a learning
+          guide and check the official sites before relying on any number.
+        </p>
+        <div className="scroll-x">
+          <table className="how-table">
+            <thead>
+              <tr><th>Topic</th><th>Real India</th><th>This platform</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>Trading hours</td><td>9:15 am to 3:30 pm, Monday to Friday, with a pre-open auction</td><td>9:30 am to 3:00 pm, Monday to Friday, no pre-open, no holidays</td></tr>
+              <tr><td>Daily limit on one stock</td><td>Set per stock: 2%, 5%, 10% or 20% (the biggest stocks have no fixed band)</td><td>20% for every stock</td></tr>
+              <tr><td>Market-wide breaker, 10%</td><td>45 min halt before 1 pm, 15 min from 1 to 2:30 pm, no halt after 2:30 pm</td><td>Same rules, with each halt shrunk to the same share of our shorter day</td></tr>
+              <tr><td>Market-wide breaker, 15%</td><td>1 h 45 min before 1 pm, 45 min from 1 to 2 pm, rest of day after 2 pm</td><td>Same rules, scaled</td></tr>
+              <tr><td>Market-wide breaker, 20%</td><td>Rest of the day, at any time</td><td>Same</td></tr>
+              <tr><td>Securities transaction tax (STT)</td><td>0.1% on buying and 0.1% on selling (delivery)</td><td>0.1% both ways</td></tr>
+              <tr><td>Brokerage</td><td>Differs by broker: Rs 0 at some, up to Rs 20 or 0.03% per order at others</td><td>Rs 20 or 0.03%, whichever is lower</td></tr>
+              <tr><td>Exchange (NSE) fee</td><td>About 0.00307% of the trade value</td><td>0.00307%</td></tr>
+              <tr><td>Regulator (SEBI) fee</td><td>Rs 10 per crore</td><td>Rs 10 per crore</td></tr>
+              <tr><td>GST on fees</td><td>18% on brokerage, exchange and SEBI fees</td><td>18% on the same</td></tr>
+              <tr><td>Stamp duty</td><td>0.015% on buying only</td><td>0.015% on buying only</td></tr>
+              <tr><td>Tax on profit, short term</td><td>20% on shares held 12 months or less</td><td>20% on each profitable sale (everything here is short term)</td></tr>
+              <tr><td>Tax on profit, long term</td><td>12.5% on the part above Rs 1.25 lakh a year, for shares held over 12 months</td><td>Not modelled</td></tr>
+              <tr><td>When tax is paid</td><td>Yearly, on total gains, with losses set against gains</td><td>At each sale, and losses are not carried forward</td></tr>
+              <tr><td>Nifty 50</td><td>50 large companies, weighted by free-float market value, base 1,000 on 3 Nov 1995, rebalanced twice a year</td><td>SANRIO 18: all 18 stocks, weighted by full market value, base 1,000 at server start, never rebalanced</td></tr>
+              <tr><td>Dividends</td><td>Paid when a company decides; the price drops on the ex-date</td><td>One quarter of the yearly yield every 5 trading days, price drops by the same amount</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p className="note-small">
+          Why simplify? The goal is an intuitive feel for how markets, indices and
+          costs work, not an exact copy. Where this platform differs, it is
+          usually to make a trading year fit into minutes.
+        </p>
+        <h4>Sources</h4>
+        <ul>
+          <li><a href="https://www.nseindia.com/static/products-services/equity-market-circuit-breakers" target="_blank" rel="noopener noreferrer">NSE: equity market circuit breakers</a></li>
+          <li><a href="https://zerodha.com/charges" target="_blank" rel="noopener noreferrer">Zerodha: charges (STT, exchange fee, GST, stamp duty, SEBI fee)</a></li>
+          <li><a href="https://stockcalc.in/calculator/ltcg" target="_blank" rel="noopener noreferrer">Capital gains rates on listed shares (short and long term)</a></li>
+          <li><a href="https://en.wikipedia.org/wiki/NIFTY_50" target="_blank" rel="noopener noreferrer">Nifty 50: how the index is built</a></li>
+        </ul>
       </div>
     </div>
   );
