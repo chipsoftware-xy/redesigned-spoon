@@ -965,6 +965,12 @@ function Developers({ stocks, indices = [] }) {
           yesterday's close, like overnight news. Real Indian markets trade 9:15
           am to 3:30 pm with a pre-open auction.
         </p>
+        <p>
+          Like real markets, the first half hour of each day is jumpier than the
+          rest, and a little extra at the close. The first day after a weekend
+          (Monday) opens with a gap more than twice as big and about double the
+          usual swings at the start, because two days of news arrive at once.
+        </p>
         <p className="note-small">
           Developers: start the server with FORCE_OPEN=1 to switch the schedule
           off and practise any time.

@@ -409,3 +409,15 @@ html[data-theme] .mode-btn.sens.active {
   color: #fff !important;
   border-color: transparent !important;
 }
+
+/* right-hand "About this price" card in dark mode: make every row readable */
+html[data-theme="dark"] .note-row span { color: var(--d-muted) !important; }
+html[data-theme="dark"] .note-row strong:not(.up):not(.down) { color: var(--d-text) !important; }
+html[data-theme="dark"] .note hr,
+html[data-theme="dark"] hr { border-color: var(--d-border) !important; background: var(--d-border); }
+html[data-theme="dark"] .note h3,
+html[data-theme="dark"] .note h4 { color: #ffd9c4 !important; }
+html[data-theme="dark"] .note-row.total-row { border-color: var(--d-border) !important; }
+html[data-theme="dark"] .trade-line,
+html[data-theme="dark"] .trade-info,
+html[data-theme="dark"] .symbol { color: var(--d-text) !important; }

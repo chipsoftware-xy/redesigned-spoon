@@ -306,12 +306,28 @@ function nextScheduleChange(ms) {
 // state: "open", "halted" (circuit breaker) or "closed"
 const startsOpen = scheduledOpen(clock());
 const session = {
+  afterWeekend: false, // true on the first trading day after a weekend (a "Monday")
   state: startsOpen ? "open" : "closed",
   day: startsOpen ? 1 : 0, // trading days since the server started
   haltUntil: 0,
   haltReason: "",
 };
 let dayStartedAt = clock(); // when the current trading day began
+
+// How far into the trading day we are (0 = the open, 1 = the close)
+function dayFraction(now) {
+  const length = FORCE_OPEN ? DEMO_DAY_MS : (CLOSE_MIN - OPEN_MIN) * 60000;
+  const start = FORCE_OPEN ? dayStartedAt : istInfo(now).dayStart + OPEN_MIN * 60000;
+  return clamp((now - start) / length, 0, 1);
+}
+
+// Real markets are jumpiest right after the open (orders pile up overnight) and a little
+// at the close. After a weekend it is much worse, because two days of news arrive at once.
+function volatilityBoost(f, afterWeekend) {
+  const open = (afterWeekend ? 1.0 : 0.35) * Math.exp(-f / 0.1); // fades over the first ~30 minutes
+  const close = 0.2 * Math.exp(-(1 - f) / 0.08);
+  return 1 + open + close;
+}
 let ticksOpen = 0; // ticks while the market was open
 const breakerHit = {}; // which circuit breaker levels have fired today
 const momentum = {};
@@ -646,7 +662,7 @@ export function tick() {
   }
 
   const m = MODES[mode];
-  const k = SENSITIVITY[sensitivity];
+  const k = SENSITIVITY[sensitivity] * volatilityBoost(dayFraction(now), session.afterWeekend);
   const marketReturn = (m.drift + randn() * m.vol) * k;
 
   // 1. each sector's momentum fades a bit and gets a little random push
@@ -808,12 +824,22 @@ function openMarket() {
   session.day += 1;
   for (const k of Object.keys(breakerHit)) delete breakerHit[k];
   dayStartedAt = clock();
+  // Monday (or every 5th demo day): the weekend's news arrives at once
+  session.afterWeekend = FORCE_OPEN
+    ? session.day > 1 && (session.day - 1) % 5 === 0
+    : istInfo(clock()).dow === 1;
   for (const ix of indices) ix.prevClose = ix.lastClose ?? ix.prevClose;
   payDividends();
 
+  // overnight news that moves the whole market the same way (twice as big after a weekend)
+  const overnightMarket = randn() * 0.004 * (session.afterWeekend ? 2.2 : 1);
+
   for (const stock of market) {
     // overnight news makes the price open away from yesterday's close (a "gap")
-    const gap = randn() * 0.006 + SECTORS[stock.sector].beta * MODES[mode].drift * 8;
+    const gap =
+      randn() * 0.004 * (session.afterWeekend ? 2.2 : 1) + // this company's own overnight news
+      SECTORS[stock.sector].beta * overnightMarket + // news that hits the whole market
+      SECTORS[stock.sector].beta * MODES[mode].drift * 8;
     stock.prevClose = stock.lastClose;
     stock.fair = clamp((stock.fair - (stock.exDiv || 0)) * (1 + gap), bandLow(stock), bandHigh(stock));
     requote(stock);
@@ -829,7 +855,13 @@ function openMarket() {
     if (stock.history.length > 60) stock.history.shift();
   }
   updateIndices(true);
-  addNews({ sector: "Market", text: `Day ${session.day}: the market is open`, up: true });
+  addNews({
+    sector: "Market",
+    text: session.afterWeekend
+      ? `Day ${session.day}: the market opens after the weekend. Two days of news arrive at once, so expect a big gap and a jumpy start`
+      : `Day ${session.day}: the market is open`,
+    up: true,
+  });
 }
 
 // ---------- waiting orders ----------
