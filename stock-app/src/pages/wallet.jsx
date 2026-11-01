@@ -76,7 +76,7 @@ function Wallet({ token, balance, setBalance }) {
         {status === "idle" && (
           <>
             <div className="network-note">
-              📶 <strong>Demo tip:</strong> Make sure your PC and mobile are
+              <strong>Demo tip:</strong> Make sure your PC and mobile are
               connected to the same network (Wi-Fi) before paying, otherwise
               the QR won't open on your phone.
             </div>
@@ -114,7 +114,7 @@ function Wallet({ token, balance, setBalance }) {
             <p>Scan with your phone to pay ₹{payment.amount}</p>
             <p className="note-small">Waiting for payment...</p>
             <p className="network-note small">
-              📶 Phone not opening the link? Check that it's on the same
+              Phone not opening the link? Check that it's on the same
               Wi-Fi as this PC.
             </p>
             <button className="tab" onClick={() => setStatus("idle")}>

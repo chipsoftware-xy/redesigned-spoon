@@ -421,3 +421,12 @@ html[data-theme="dark"] .note-row.total-row { border-color: var(--d-border) !imp
 html[data-theme="dark"] .trade-line,
 html[data-theme="dark"] .trade-info,
 html[data-theme="dark"] .symbol { color: var(--d-text) !important; }
+
+/* formula boxes (code blocks) in dark mode: they kept a dark text colour */
+html[data-theme="dark"] code,
+html[data-theme="dark"] pre,
+html[data-theme="dark"] .block {
+  color: #ffd2bd !important;
+  background: var(--d-surface-2) !important;
+  border-color: var(--d-border) !important;
+}
