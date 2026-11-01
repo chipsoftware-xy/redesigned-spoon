@@ -225,7 +225,7 @@ function LiveComparison({ stocks }) {
   const lineColor = side === "buy" ? "#16a34a" : "#dc2626";
 
   return (
-    <div className="doc-card" id="live">
+    <section className="doc-text" id="live">
       <h3>Live comparison: this platform versus a real stock</h3>
       <p>
         Left: a made-up stock on this platform, live. Right: a real Indian stock
@@ -427,7 +427,7 @@ function LiveComparison({ stocks }) {
           can move wildly on small volumes.
         </li>
       </ul>
-    </div>
+    </section>
   );
 }
 
@@ -473,7 +473,7 @@ function ValuationAndIndices({ stocks, indices }) {
   }
 
   return (
-    <div className="doc-card" id="valuation">
+    <section className="doc-text" id="valuation">
       <h3>2. Valuation and index math, compared with the real thing</h3>
 
       <div className="advisory">
@@ -620,7 +620,7 @@ function ValuationAndIndices({ stocks, indices }) {
         more risk. Real sectors look similar: technology usually trades at a
         higher P/E than banks.
       </p>
-    </div>
+    </section>
   );
 }
 
@@ -653,8 +653,8 @@ function Developers({ stocks, indices = [] }) {
 
       {stocks.length > 0 && <LiveComparison stocks={stocks} />}
 
-      <div className="doc-card" id="price">
-        <h3>1. How a price is set (every 2 seconds)</h3>
+      <section className="doc-text" id="price">
+      <h3>1. How a price is set (every 2 seconds)</h3>
         <p>
           Each stock has a hidden <strong>fair value</strong>: what the mood and
           news say it should be worth. Every tick the formula moves it:
@@ -750,12 +750,12 @@ function Developers({ stocks, indices = [] }) {
           Changing the mood does not jump prices. It changes the push, and the
           effect builds as ticks pass. A visible crash needs a minute or two.
         </p>
-      </div>
+      </section>
 
       {stocks.length > 0 && <ValuationAndIndices stocks={stocks} indices={indices} />}
 
-      <div className="doc-card" id="book">
-        <h3>3. The order book and your order</h3>
+      <section className="doc-text" id="book">
+      <h3>3. The order book and your order</h3>
         <p>
           The visible price is the price of the <strong>last trade</strong>.
           Around fair value, market makers post waiting orders on both sides:
@@ -816,10 +816,10 @@ function Developers({ stocks, indices = [] }) {
           are many more levels. A real exchange also has hidden orders, order
           types such as iceberg orders, and trades across several venues.
         </p>
-      </div>
+      </section>
 
-      <div className="doc-card" id="bots">
-        <h3>4. The bots, one by one</h3>
+      <section className="doc-text" id="bots">
+      <h3>4. The bots, one by one</h3>
         <p>
           Every tick, every stock gets a round of orders from the bots below, in
           random order. Their sizes are a share of the stock's liquidity, so a bot
@@ -855,10 +855,10 @@ function Developers({ stocks, indices = [] }) {
           the stock page splits each move into market mood, sector, results, bot
           order flow and your own orders.
         </p>
-      </div>
+      </section>
 
-      <div className="doc-card" id="fees">
-        <h3>5. Charges and tax (fake)</h3>
+      <section className="doc-text" id="fees">
+      <h3>5. Charges and tax (fake)</h3>
         <p>
           Every real trade has costs, so every trade here does too. The rates are
           modelled on Indian delivery trades but simplified, and the money is
@@ -894,10 +894,10 @@ function Developers({ stocks, indices = [] }) {
           Buy and sell the same shares straight away to see what it costs: the
           spread, the price impact and about 0.15% in charges each way.
         </p>
-      </div>
+      </section>
 
-      <div className="doc-card" id="breakers">
-        <h3>6. Circuit breakers</h3>
+      <section className="doc-text" id="breakers">
+      <h3>6. Circuit breakers</h3>
         <p>Two layers, as in real Indian markets:</p>
         <ul>
           <li>
@@ -931,10 +931,10 @@ function Developers({ stocks, indices = [] }) {
           stock its own daily band (2%, 5%, 10% or 20%, and no fixed band for
           the biggest stocks); here every stock uses 20%.
         </p>
-      </div>
+      </section>
 
-      <div className="doc-card" id="company">
-        <h3>7. Company data and results</h3>
+      <section className="doc-text" id="company">
+      <h3>7. Company data and results</h3>
         <p>
           Each company has an earnings per share (EPS). The P/E ratio on the stock
           page is simply the price divided by EPS. Net profit = EPS x shares. Every
@@ -953,10 +953,10 @@ function Developers({ stocks, indices = [] }) {
           All companies are invented, with a note on which real kind of company
           each one is loosely modelled on.
         </p>
-      </div>
+      </section>
 
-      <div className="doc-card" id="hours">
-        <h3>8. Market hours</h3>
+      <section className="doc-text" id="hours">
+      <h3>8. Market hours</h3>
         <p>
           Open 9:30 am to 3:00 pm India time, Monday to Friday. Closed on weekends
           (public holidays are not modelled). While closed, prices are frozen and
@@ -975,10 +975,10 @@ function Developers({ stocks, indices = [] }) {
           Developers: start the server with FORCE_OPEN=1 to switch the schedule
           off and practise any time.
         </p>
-      </div>
+      </section>
 
-      <div className="doc-card" id="reality">
-        <h3>9. Real rules compared with this platform</h3>
+      <section className="doc-text" id="reality">
+      <h3>9. Real rules compared with this platform</h3>
         <p>
           A quick reference of the real Indian rules this platform copies, and
           where it deliberately simplifies. Checked in November 2026 against the
@@ -1022,7 +1022,7 @@ function Developers({ stocks, indices = [] }) {
           <li><a href="https://stockcalc.in/calculator/ltcg" target="_blank" rel="noopener noreferrer">Capital gains rates on listed shares (short and long term)</a></li>
           <li><a href="https://en.wikipedia.org/wiki/NIFTY_50" target="_blank" rel="noopener noreferrer">Nifty 50: how the index is built</a></li>
         </ul>
-      </div>
+      </section>
     </div>
   );
 }

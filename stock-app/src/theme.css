@@ -430,3 +430,40 @@ html[data-theme="dark"] .block {
   background: var(--d-surface-2) !important;
   border-color: var(--d-border) !important;
 }
+
+
+/* ===== Collapsible cards: a page is a short list of headings, open what you want ===== */
+details.fold > summary {
+  list-style: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+details.fold > summary::-webkit-details-marker { display: none; }
+details.fold > summary h3 { margin: 0; }
+details.fold > summary::after {
+  content: "";
+  flex: none;
+  width: 9px;
+  height: 9px;
+  border-right: 2px solid currentColor;
+  border-bottom: 2px solid currentColor;
+  transform: rotate(45deg);
+  opacity: 0.6;
+  transition: transform 0.15s;
+}
+details.fold[open] > summary::after { transform: rotate(-135deg); }
+details.fold[open] > summary { margin-bottom: 12px; }
+details.fold:not([open]) { padding-top: 14px !important; padding-bottom: 14px !important; }
+
+.fold-inline { margin: 8px 0 14px; }
+.fold-inline > summary { cursor: pointer; font-size: 14px; font-weight: 600; padding: 6px 0; }
+html[data-theme="dark"] .fold-inline > summary { color: #ffd2bd; }
+html[data-theme="light"] .fold-inline > summary { color: #A30262; }
+
+
+/* Reading pages (Learn, Developers, How it works): plain text, no boxes */
+section.doc-text { margin: 28px 0; scroll-margin-top: 16px; }
+section.doc-text > h3 { margin: 0 0 8px; }

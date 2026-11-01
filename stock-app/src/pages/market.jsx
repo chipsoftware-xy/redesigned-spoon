@@ -176,6 +176,8 @@ function Market({
               </button>
             ))}
           </div>
+          <details className="fold-inline">
+            <summary>How moods and sensitivity work</summary>
           <p className="note-small">
             Sensitivity is how strongly prices react to the mood, news and random
             noise. <strong>Calm</strong> halves the reaction: prices drift slowly,
@@ -198,6 +200,7 @@ function Market({
             This is a shared simulation: changing the mood changes it for
             everyone using the platform.
           </p>
+          </details>
 
           {studies.length > 0 && (
             <div className="case-box">

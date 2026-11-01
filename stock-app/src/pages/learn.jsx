@@ -78,10 +78,10 @@ const GLOSSARY = [
 
 function Section({ title, children }) {
   return (
-    <div className="doc-card">
+    <section className="doc-text">
       <h3>{title}</h3>
       {children}
-    </div>
+    </section>
   );
 }
 

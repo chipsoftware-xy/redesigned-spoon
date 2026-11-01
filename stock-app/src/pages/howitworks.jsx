@@ -82,7 +82,7 @@ const ROWS = [
   {
     what: "Circuit breakers",
     real: "Trading halts if the market falls too fast. In India the market-wide levels are 10%, 15% and 20%, and each stock has its own daily price limit.",
-    here: "Each stock can move 20% from yesterday's close at most. If SANRIO 18 moves 10%, 15% or 20% from yesterday's close, trading halts for 15 minutes, 30 minutes and the rest of the day. Real halt lengths depend on the time of day, here they are fixed.",
+    here: "Each stock can move 20% from yesterday's close at most. If SANRIO 18 moves 10%, 15% or 20% from yesterday's close, trading halts. As in India, how long depends on the time of day (a 10% fall early in the day halts longer than one at 1 pm, and a 10% fall after 2:30 pm does not halt at all). The lengths are scaled to this platform's shorter day.",
     status: "close",
   },
   {
@@ -94,7 +94,7 @@ const ROWS = [
   {
     what: "Costs",
     real: "Brokerage, taxes and fees.",
-    here: "Brokerage, STT, exchange fees, GST and stamp duty on every trade, plus 20% tax on profit when you sell. Rates are modelled on Indian delivery trades but simplified, and tax does not depend on how long you hold.",
+    here: "Brokerage, STT, exchange fees, GST and stamp duty on every trade, plus 20% tax on profit when you sell. Rates are modelled on Indian delivery trades. The 20% is the real short-term rate (shares held 12 months or less); long-term gains are not modelled, and tax is taken at each sale instead of once a year.",
     status: "simplified",
   },
 ];
@@ -120,8 +120,8 @@ function HowItWorks() {
       <Link to="/">← Back to market</Link>
       <h1>How this platform simulates a real market</h1>
 
-      <div className="doc-card">
-        <h3>The short version</h3>
+      <section className="doc-text">
+      <h3>The short version</h3>
         <p>
           A real exchange matches buyers and sellers, and the price is whatever
           the last trade was. This platform has no crowd, so a formula plays the
@@ -134,10 +134,10 @@ function HowItWorks() {
           replay. The numbers behind each mood were chosen to look right, not
           fitted to historical data.
         </p>
-      </div>
+      </section>
 
-      <div className="doc-card">
-        <h3>How one price moves (every 2 seconds)</h3>
+      <section className="doc-text">
+      <h3>How one price moves (every 2 seconds)</h3>
         <code className="block">
           move = sector beta × market mood + sector momentum + spillover from
           other sectors + noise
@@ -170,10 +170,10 @@ function HowItWorks() {
           shrinks in scary markets. That is why the same order moves a small
           company more than a big one, and moves anything more in a crash.
         </p>
-      </div>
+      </section>
 
-      <div className="doc-card">
-        <h3>How the indices are built</h3>
+      <section className="doc-text">
+      <h3>How the indices are built</h3>
         <code className="block">
           index = 1000 × (sum of price × shares now) ÷ (sum of price × shares
           at the start)
@@ -206,10 +206,10 @@ function HowItWorks() {
             ))}
           </tbody>
         </table>
-      </div>
+      </section>
 
-      <div className="doc-card">
-        <h3>Real market vs this platform</h3>
+      <section className="doc-text">
+      <h3>Real market vs this platform</h3>
         <table className="how-table">
           <thead>
             <tr>
@@ -236,10 +236,10 @@ function HowItWorks() {
             ))}
           </tbody>
         </table>
-      </div>
+      </section>
 
-      <div className="doc-card">
-        <h3>Learning mode vs Realistic mode</h3>
+      <section className="doc-text">
+      <h3>Learning mode vs Realistic mode</h3>
         <p>
           Both modes use the same shared market. Learning mode shows the
           machinery: the mood buttons, the case studies, the base value line,
@@ -247,7 +247,7 @@ function HowItWorks() {
           table. Realistic mode hides all of that and shows what a normal
           trading app shows, so you can practise without the hints.
         </p>
-      </div>
+      </section>
     </div>
   );
 }
