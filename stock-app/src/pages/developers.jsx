@@ -959,7 +959,10 @@ function Developers({ stocks, indices = [] }) {
       <h3>8. Market hours</h3>
         <p>
           Open 9:30 am to 3:00 pm India time, Monday to Friday. Closed on weekends
-          (public holidays are not modelled). While closed, prices are frozen and
+          and on the NSE's weekday holidays for 2026 (Diwali, Christmas, Holi and
+          so on, copied from the exchange's list). The first day after any
+          weekend or holiday opens jumpier, because the news of the break arrives
+          at once. While closed, prices are frozen and
           market orders are refused. Limit and stop orders can still be placed and
           wait. At each new open, every stock opens with a small random gap from
           yesterday's close, like overnight news. Real Indian markets trade 9:15

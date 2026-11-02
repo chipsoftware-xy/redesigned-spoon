@@ -352,7 +352,7 @@ function settle(username, side, symbol, qty, cost, via = "market") {
 // The browser only says WHAT it wants. The server decides the price.
 
 const CLOSED_TEXT =
-  "The market is closed (open 9:30 am to 3:00 pm India time, Monday to Friday). You can still place a limit, stop or trailing order, and it will wait for the open.";
+  "The market is closed (open 9:30 am to 3:00 pm India time, Monday to Friday, except exchange holidays). You can still place a limit, stop or trailing order, and it will wait for the open.";
 
 function closedMessage() {
   const ms = marketState();

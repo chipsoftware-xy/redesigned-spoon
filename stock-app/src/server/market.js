@@ -137,12 +137,31 @@ const BOTS = {
 
 // ---------- trading hours (like the real Indian market) ----------
 // Open 9:30 am to 3:00 pm India time (IST), Monday to Friday. Closed on weekends.
-// (Public holidays are not modelled.)
+// Weekday exchange holidays are listed below (NSE equity segment, 2026). Add next year's
+// dates when the NSE publishes them; after the last date the market simply trades every weekday.
 // To practise outside these hours, start the server with FORCE_OPEN=1.
 const OPEN_MIN = 9 * 60 + 30; // minutes after midnight
 const CLOSE_MIN = 15 * 60;
 const IST_MS = 5.5 * 60 * 60 * 1000;
 const FORCE_OPEN = process.env.FORCE_OPEN === "1";
+const HOLIDAYS = {
+  "2026-01-15": "Municipal Corporation Election in Maharashtra",
+  "2026-01-26": "Republic Day",
+  "2026-03-03": "Holi",
+  "2026-03-26": "Shri Ram Navami",
+  "2026-03-31": "Shri Mahavir Jayanti",
+  "2026-04-03": "Good Friday",
+  "2026-04-14": "Dr. Baba Saheb Ambedkar Jayanti",
+  "2026-05-01": "Maharashtra Day",
+  "2026-05-28": "Bakri Id",
+  "2026-06-26": "Muharram",
+  "2026-09-14": "Ganesh Chaturthi",
+  "2026-10-02": "Mahatma Gandhi Jayanti",
+  "2026-10-20": "Dussehra",
+  "2026-11-10": "Diwali-Balipratipada",
+  "2026-11-24": "Prakash Gurpurb Sri Guru Nanak Dev",
+  "2026-12-25": "Christmas",
+};
 
 // ---------- circuit breakers ----------
 // Stock level: a price can only move this far from yesterday's close in a day.
@@ -285,20 +304,29 @@ function istInfo(ms) {
     dayStart: Date.UTC(t.getUTCFullYear(), t.getUTCMonth(), t.getUTCDate()) - IST_MS,
   };
 }
+// The name of the exchange holiday on the India date that starts at dayStart (or undefined)
+function holidayOn(dayStart) {
+  return HOLIDAYS[new Date(dayStart + IST_MS).toISOString().slice(0, 10)];
+}
+// Weekday and not a holiday
+function isTradingDay(dayStart) {
+  const dow = new Date(dayStart + IST_MS).getUTCDay();
+  return dow >= 1 && dow <= 5 && !holidayOn(dayStart);
+}
 function scheduledOpen(ms) {
   if (FORCE_OPEN) return true;
-  const { dow, mins } = istInfo(ms);
-  return dow >= 1 && dow <= 5 && mins >= OPEN_MIN && mins < CLOSE_MIN;
+  const { dayStart, mins } = istInfo(ms);
+  return isTradingDay(dayStart) && mins >= OPEN_MIN && mins < CLOSE_MIN;
 }
 // when the schedule next flips between open and closed
 function nextScheduleChange(ms) {
-  const { dow, dayStart } = istInfo(ms);
+  const { dayStart } = istInfo(ms);
   if (FORCE_OPEN) return ms + 60 * 60 * 1000;
   if (scheduledOpen(ms)) return dayStart + CLOSE_MIN * 60000;
-  for (let d = 0; d < 8; d++) {
-    const dw = (dow + d) % 7;
-    const t = dayStart + d * 86400000 + OPEN_MIN * 60000;
-    if (dw >= 1 && dw <= 5 && t > ms) return t;
+  for (let d = 0; d < 14; d++) {
+    const day = dayStart + d * 86400000;
+    const t = day + OPEN_MIN * 60000;
+    if (isTradingDay(day) && t > ms) return t;
   }
   return ms + 60 * 60 * 1000;
 }
@@ -831,10 +859,10 @@ function openMarket() {
   session.day += 1;
   for (const k of Object.keys(breakerHit)) delete breakerHit[k];
   dayStartedAt = clock();
-  // Monday (or every 5th demo day): the weekend's news arrives at once
+  // First day after a weekend or holiday (or every 5th demo day): the news of the break arrives at once
   session.afterWeekend = FORCE_OPEN
     ? session.day > 1 && (session.day - 1) % 5 === 0
-    : istInfo(clock()).dow === 1;
+    : !isTradingDay(istInfo(clock()).dayStart - 86400000); // the day before was a weekend or holiday
   for (const ix of indices) ix.prevClose = ix.lastClose ?? ix.prevClose;
   payDividends();
 
@@ -1295,6 +1323,7 @@ export function getMarket() {
       day: session.day,
       reason: session.state === "halted" ? session.haltReason : "",
       forced: FORCE_OPEN,
+      holiday: FORCE_OPEN ? null : holidayOn(istInfo(clock()).dayStart) || null,
       remainingMs: Math.max(
         0,
         (session.state === "halted" ? session.haltUntil : nextScheduleChange(clock())) - clock()

@@ -70,7 +70,7 @@ const ROWS = [
   {
     what: "Market hours",
     real: "Indian markets trade about 9:15 am to 3:30 pm IST on weekdays, with a daily open and close.",
-    here: "Open 9:30 am to 3:00 pm India time, Monday to Friday, and closed on weekends. While closed, prices are frozen and market orders are refused. Each new day opens with a small gap from the previous close, like overnight news does. Day change is measured from the previous close. Holidays and the pre-open auction are not modelled. Moods and news are sped up a lot compared with real life.",
+    here: "Open 9:30 am to 3:00 pm India time, Monday to Friday, and closed on weekends and on the 2026 NSE weekday holidays. While closed, prices are frozen and market orders are refused. Each new day opens with a small gap from the previous close, like overnight news does. Day change is measured from the previous close. The first day after a weekend or holiday opens jumpier. The pre-open auction is not modelled. Moods and news are sped up a lot compared with real life.",
     status: "close",
   },
   {

@@ -62,11 +62,11 @@ function SessionBar({ session, at }) {
 
   return wrap(
     session.open ? "open" : "closed",
-    session.open ? "Market open" : "Market closed",
+    session.open ? "Market open" : session.holiday ? "Market closed: holiday" : "Market closed",
     `${session.open ? "Closes" : "Opens"} in ${clock} · Day ${session.day}`,
     session.open
-      ? "Trading hours: 9:30 am to 3:00 pm India time, Monday to Friday."
-      : "Trading hours: 9:30 am to 3:00 pm India time, Monday to Friday. Prices are frozen. Limit and stop orders can still be placed and will wait for the open."
+      ? "Trading hours: 9:30 am to 3:00 pm India time, Monday to Friday, except exchange holidays."
+      : `${session.holiday ? `Holiday today: ${session.holiday}. ` : ""}Trading hours: 9:30 am to 3:00 pm India time, Monday to Friday, except exchange holidays. Prices are frozen. Limit and stop orders can still be placed and will wait for the open.`
   );
 }
 
