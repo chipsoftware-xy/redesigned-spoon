@@ -8,6 +8,8 @@ import {
   setMode,
   setSensitivity,
   startMarket,
+  exportState,
+  importState,
   previewOrder,
   executeOrder,
   isOpen,
@@ -80,6 +82,7 @@ async function flush() {
 for (const sig of ["SIGTERM", "SIGINT"]) {
   process.on(sig, async () => {
     await flush();
+    await saveMarket();
     process.exit(0);
   });
 }
@@ -616,6 +619,28 @@ app.post("/api/payments/:id/claim", auth, (req, res) => {
   touchUser(req.username);
   res.json({ ok: true, amount: payment.amount, balance: data.balance });
 });
+
+// The market carries on from where it stopped, like a real one does the next morning
+try {
+  const saved = await storage.loadMarket();
+  if (saved && importState(saved)) console.log("Market restored from the last save");
+} catch (err) {
+  console.error("Could not restore the market, starting fresh:", err.message);
+}
+let lastMarketSave = "";
+async function saveMarket() {
+  try {
+    const text = exportState();
+    // savedAt changes every time, so compare without it to skip pointless writes
+    const key = text.replace(/"savedAt":\d+,/, "");
+    if (key === lastMarketSave) return;
+    await storage.saveMarket(text);
+    lastMarketSave = key;
+  } catch (err) {
+    console.error("Could not save the market:", err.message);
+  }
+}
+setInterval(saveMarket, 30000);
 
 startMarket();
 

@@ -25,6 +25,18 @@ function fileStorage() {
         return { users: {}, sessions: {} };
       }
     },
+    async loadMarket() {
+      try {
+        return fs.readFileSync(new URL("./market.json", import.meta.url), "utf8");
+      } catch {
+        return null;
+      }
+    },
+    async saveMarket(text) {
+      const tmp = new URL("./market.json.tmp", import.meta.url);
+      fs.writeFileSync(tmp, text);
+      fs.renameSync(tmp, new URL("./market.json", import.meta.url));
+    },
     // writes everything; writes to a temp file first so a crash cannot leave half a file
     async flush(db) {
       const tmp = new URL("./data.json.tmp", import.meta.url);
@@ -84,6 +96,13 @@ function upstashStorage(url, token) {
         });
       }
       return { users, sessions };
+    },
+    async loadMarket() {
+      const [value] = await pipeline([["GET", "market:state"]]);
+      return value || null;
+    },
+    async saveMarket(text) {
+      await pipeline([["SET", "market:state", text]]);
     },
     // only writes what changed
     async flush(db, changes) {

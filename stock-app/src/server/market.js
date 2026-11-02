@@ -328,6 +328,13 @@ function volatilityBoost(f, afterWeekend) {
   const close = 0.2 * Math.exp(-(1 - f) / 0.08);
   return 1 + open + close;
 }
+// The mood numbers above were chosen for a short practice day (about 600 ticks). A real
+// trading day is 6 hours 15 minutes, about 11,000 ticks, so without this the index would swing
+// 15% a day and trip a circuit breaker every morning. Real Nifty moves about 1% on a normal day.
+const TIME_SCALE = FORCE_OPEN ? 1 : Number(process.env.TIME_SCALE) || 0.05; // random wiggles
+// A mood's drift adds up tick after tick (random wiggles only grow with the square root of
+// the number of ticks), so it has to be cut far more: a bull day is about +2%, a crash about -3%.
+const DRIFT_SCALE = FORCE_OPEN ? 1 : Number(process.env.DRIFT_SCALE) || 0.0015;
 let ticksOpen = 0; // ticks while the market was open
 const breakerHit = {}; // which circuit breaker levels have fired today
 const momentum = {};
@@ -662,8 +669,8 @@ export function tick() {
   }
 
   const m = MODES[mode];
-  const k = SENSITIVITY[sensitivity] * volatilityBoost(dayFraction(now), session.afterWeekend);
-  const marketReturn = (m.drift + randn() * m.vol) * k;
+  const k = SENSITIVITY[sensitivity] * TIME_SCALE * volatilityBoost(dayFraction(now), session.afterWeekend);
+  const marketReturn = (m.drift * DRIFT_SCALE * (k / TIME_SCALE) + randn() * m.vol * k);
 
   // 1. each sector's momentum fades a bit and gets a little random push
   for (const sector of Object.keys(SECTORS)) {
@@ -1157,6 +1164,75 @@ export function isOpen() {
 // Why the market is not open (used for messages)
 export function marketState() {
   return { state: session.state, reason: session.haltReason };
+}
+
+// ---------- remembering the market between restarts ----------
+// A real market starts each morning where it closed the night before. These two functions
+// turn the market into text (exportState) and back (importState), so the server can keep
+// it in the database and pick up from there after a restart or a redeploy.
+export function exportState() {
+  return JSON.stringify({
+    v: 1,
+    savedAt: clock(),
+    market: market.map((stock) => ({ ...stock, book: undefined, tape: undefined })), // the book is rebuilt on load
+    indices,
+    mode,
+    sensitivity,
+    news,
+    trades,
+    session,
+    dayStartedAt,
+    ticksOpen,
+    breakerHit,
+    momentum,
+    pending,
+    orderSeq,
+    groupSeq,
+    orderEvents,
+  });
+}
+
+export function importState(text) {
+  let d;
+  try {
+    d = JSON.parse(text);
+  } catch {
+    return false;
+  }
+  if (!d || d.v !== 1 || !Array.isArray(d.market)) return false;
+
+  for (const saved of d.market) {
+    const stock = bySymbol[saved.symbol];
+    if (stock) Object.assign(stock, saved, { book: { bids: [], asks: [] }, tape: [] });
+  }
+  for (const saved of d.indices || []) {
+    const ix = indices.find((x) => x.id === saved.id);
+    if (ix) Object.assign(ix, saved, { members: ix.members, baseCap: ix.baseCap });
+  }
+  if (Object.hasOwn(MODES, d.mode)) mode = d.mode;
+  if (Object.hasOwn(SENSITIVITY, d.sensitivity)) sensitivity = d.sensitivity;
+  news = d.news || [];
+  trades = d.trades || [];
+  Object.assign(session, d.session);
+  dayStartedAt = d.dayStartedAt ?? dayStartedAt;
+  ticksOpen = d.ticksOpen ?? 0;
+  for (const k of Object.keys(breakerHit)) delete breakerHit[k];
+  Object.assign(breakerHit, d.breakerHit);
+  Object.assign(momentum, d.momentum);
+  pending = d.pending || [];
+  orderSeq = d.orderSeq || 1;
+  groupSeq = d.groupSeq || 1;
+  orderEvents = d.orderEvents || [];
+
+  // If the server was off overnight (or over a weekend), the saved day is over: close it
+  // properly so the next tick opens a fresh day with that morning's gap.
+  if (!FORCE_OPEN && session.state !== "closed") {
+    const sameDay = istInfo(d.savedAt).dayStart === istInfo(clock()).dayStart;
+    if (!sameDay) closeMarket();
+  }
+  for (const stock of market) requote(stock);
+  updateIndices(false);
+  return true;
 }
 
 export function startMarket() {
