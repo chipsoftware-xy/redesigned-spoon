@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { BrowserRouter, Routes, Route, Link } from "react-router-dom";
+import { Analytics } from "@vercel/analytics/react";
 import Market from "./pages/market";
 import StockDetail from "./pages/stockdetail";
 import Wallet from "./pages/wallet";
@@ -607,6 +608,7 @@ function App() {
 
       <Footer />
       {notice && <div className="toast">{notice}</div>}
+      <Analytics />
     </BrowserRouter>
   );
 }
